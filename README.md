@@ -6,4 +6,4 @@
     - Using Restful api to connect with React.
     - Use MySQL for databases.
 
-well, this repos is for learning.. so there's nothing much ;D
+Well, this repository is for learning. so there's nothing much ;D

@@ -1,5 +1,7 @@
 package com.example.jwt.config.auth.jwt;
 
+import com.auth0.jwt.JWT;
+import com.auth0.jwt.algorithms.Algorithm;
 import com.example.jwt.config.auth.PrincipalDetails;
 import com.example.jwt.model.User;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -16,6 +18,7 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 
 import java.io.BufferedReader;
 import java.io.IOException;
+import java.util.Date;
 
 // 스프링 시큐리티에서 UsernamePasswordAuthenticationFilter가 있음
 // /login 요청해서 post 하면
@@ -70,6 +73,17 @@ public class JwtAuthenticationFilter extends UsernamePasswordAuthenticationFilte
     @Override
     protected void successfulAuthentication(HttpServletRequest request, HttpServletResponse response, FilterChain chain, Authentication authResult) throws IOException, ServletException {
         System.out.println("successfulAuthentication : 로그인 정상적으로 되었음");
-        super.successfulAuthentication(request, response, chain, authResult);
+
+        PrincipalDetails principalDetails = (PrincipalDetails) authResult.getPrincipal();
+
+        // RSA방식 아니고 Hash 암호 방식임
+        String jwtToken = JWT.create()
+                .withSubject("cos_token")
+                .withExpiresAt(new Date(System.currentTimeMillis() + JwtProperties.EXPIRATION_TIME))
+                .withClaim("id", principalDetails.getUser().getId())
+                .withClaim("username", principalDetails.getUser().getUsername())
+                .sign(Algorithm.HMAC512(JwtProperties.SECRET));
+
+        response.addHeader(JwtProperties.HEADER_STRING, JwtProperties.TOKEN_PREFIX + jwtToken);
     }
 }

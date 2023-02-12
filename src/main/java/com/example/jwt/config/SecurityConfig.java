@@ -1,8 +1,8 @@
 package com.example.jwt.config;
 
 import com.example.jwt.config.auth.jwt.JwtAuthenticationFilter;
-import com.example.jwt.filter.MyFilter1;
-import com.example.jwt.filter.MyFilter3;
+import com.example.jwt.config.auth.jwt.JwtAuthorizationFilter;
+import com.example.jwt.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -25,6 +25,9 @@ public class SecurityConfig {
     @Autowired
     private CorsConfig corsConfig;
 
+    @Autowired
+    private UserRepository userRepository;
+
     @Bean
     public BCryptPasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder();
@@ -32,7 +35,7 @@ public class SecurityConfig {
 
     @Bean
     SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
-        http.addFilterBefore(new MyFilter3(), UsernamePasswordAuthenticationFilter.class);
+//        http.addFilterBefore(new MyFilter3(), UsernamePasswordAuthenticationFilter.class);
         http.csrf().disable()
                 .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS)
                 .and()
@@ -54,7 +57,8 @@ public class SecurityConfig {
             AuthenticationManager authenticationManager = http.getSharedObject(AuthenticationManager.class);
             http
                     .addFilter(corsConfig.corsFilter())
-                    .addFilter(new JwtAuthenticationFilter(authenticationManager));
+                    .addFilter(new JwtAuthenticationFilter(authenticationManager))
+                    .addFilter(new JwtAuthorizationFilter(authenticationManager, userRepository));
 
         }
     }

@@ -1,13 +1,12 @@
 package com.example.jwt.controller;
 
 
+import com.example.jwt.config.auth.PrincipalDetails;
 import com.example.jwt.model.User;
 import com.example.jwt.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.annotation.Bean;
+import org.springframework.security.core.Authentication;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
-import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -17,6 +16,16 @@ public class RestApiController {
 
     private final UserRepository userRepository;
     private final BCryptPasswordEncoder bCryptPasswordEncoder;
+
+    @GetMapping("user")
+    public String user(Authentication authentication) {
+        PrincipalDetails principal = (PrincipalDetails) authentication.getPrincipal();
+        System.out.println("principal : " + principal.getUser().getId());
+        System.out.println("principal : " + principal.getUser().getUsername());
+        System.out.println("principal : " + principal.getUser().getPassword());
+
+        return "<h1>user</h1>";
+    }
 
     @PostMapping("/token")
     public String token() {
@@ -36,5 +45,23 @@ public class RestApiController {
         user.setRoles("USER");
         userRepository.save(user);
         return "registration complete.";
+    }
+
+    // user, manager, admin
+    @GetMapping("/api/v1/user")
+    public String user() {
+        return "user";
+    }
+
+    // manager, admin
+    @GetMapping("/api/v1/manager")
+    public String manager() {
+        return "manager";
+    }
+
+    // admin
+    @GetMapping("/api/v1/admin")
+    public String admin() {
+        return "admin";
     }
 }
