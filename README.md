@@ -6,7 +6,7 @@
     - Using Restful api to connect with React.
     - Use MySQL for databases.
 
-# Spring Security -완-
+# Spring Security
 
 1. 세션 방식
 
